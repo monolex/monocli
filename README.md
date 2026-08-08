@@ -1,11 +1,22 @@
 # monocli
 
-**One terminal browser for all your AI CLI sessions.**
+**The canonical session layer for AI CLIs.**
 
-Claude Code, Codex, Grok, OpenCode, and Antigravity each keep their session
-transcripts in their own private format, in their own corner of your disk.
-monocli reads them all through one canonical interface — browse, search,
-read, export, resume, and even *move sessions between CLIs*.
+Claude Code, Codex, Grok, OpenCode, and Antigravity each speak a private
+session dialect — different files, different schemas, different tool-call
+encodings. monocli normalizes all of them into one **complete** canonical
+model: every message, every tool call and its result, thinking blocks,
+images, timestamps, native IDs, token usage, git context, session lineage.
+
+Complete enough to browse and search everything in one place — and complete
+enough to **write a whole session back into another CLI's own store** and
+keep working there. Translation has no fidelity levels and no text fallback:
+every block transfers, verified one-by-one against the source, or the write
+fails closed.
+
+Your sessions stop being app-locked artifacts and become portable data you
+own. monocli is the session plane of [Monolex](https://monolex.ai) — one
+concept layer of the AI-native terminal, shipped as a standalone CLI.
 
 > 🎬 **Demo video:** [watch the 2-minute demo](https://drive.google.com/file/d/1yfJIDcbOtL9j4aF5vqPfpaUTt5HRJK3N/view)
 >
@@ -80,17 +91,24 @@ lineage — so every command works identically across providers.
 
 ## Highlights
 
+- **A complete canonical model, not a lowest common denominator** — roles,
+  tool calls *and their results*, thinking blocks, images, native IDs,
+  request metadata, token usage, git branch/commit context, forks and
+  parent edges. If a provider recorded it, the canonical form carries it;
+  unmapped provider tools are preserved verbatim (`ToolCall::Unknown` keeps
+  the raw name and args) instead of being dropped.
+- **Universal native transcode** — `translate --native` writes a *real*
+  session into the target CLI's own store, block by block. Every message,
+  tool call, tool result, timestamp, and image is reconstructed in the
+  target's native encoding, then the written session is reparsed through the
+  target adapter and verified against the source before it lands. No
+  fidelity levels, no text fallback — a session that cannot be represented
+  losslessly fails closed instead of being silently truncated.
 - **Interactive TUI** — a fast 2-panel terminal browser over every session on
   the machine. Bare `monocli` opens it; piping falls back to script-friendly
   list output.
 - **Cross-CLI full-text search** — BM25-ranked FTS5 index over all providers
   at once, with a bounded linear-scan fallback when unindexed.
-- **Universal native transcode** — `translate --native` writes a *real*
-  session into the target CLI's own store. Every message, tool block,
-  timestamp, and image is preserved; each write is reparsed through the
-  target adapter and verified against the source before it lands. No fidelity
-  levels, no text fallback — a session that cannot be represented losslessly
-  fails closed instead of being silently truncated.
 - **Session lineage** — fork sessions across CLIs, link parent/child edges
   between providers, and reconcile pending forks into a cross-CLI timeline.
 - **Resume anywhere** — `monocli resume` emits the exact provider-native
