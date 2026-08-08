@@ -224,24 +224,24 @@ when no canonical mapping exists — used for future provider-specific tools.
 
 ```
                                   ┌──────────────────┐
-                  monocli list ───→│  enumerate all   │
+                  monocli list ──→│  enumerate all   │
                                   │  registered      │
                                   │  adapters        │
                                   └────────┬─────────┘
-                                            │
+                                           │
                   ┌────────────────────────┼─────────────────────┐
-                  │                         │                     │
+                  │                        │                     │
             ClaudeAdapter             CodexAdapter         Grok/OpenCode/Agy
-            ~/.claude/projects        ~/.codex/sessions
-                  │                         │
-            decode dir+content      decode payload events
-                  │                         │
+            ~/.claude/projects        ~/.codex/sessions          │
+                  │                        │                     │
+            decode dir+content      decode payload events        │
+                  │                        │                     │
                   └────────────────────────┼─────────────────────┘
-                                            ↓
+                                           ↓
                               canonical Vec<SessionMeta>
-                                            ↓
+                                           ↓
                           sort by last_at, apply --limit
-                                            ↓
+                                           ↓
                                      render table
 ```
 
@@ -321,4 +321,6 @@ and `title`.
 ---
 
 Built on `lib-monosession`, the canonical AI-session model behind the
-Monolex AI terminal. © Umzikim Inc.
+Monolex AI terminal.
+
+A **[Monolex AI](https://monolex.ai)** project.
