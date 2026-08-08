@@ -1,5 +1,7 @@
 # monocli
 
+### 🌐 [monolex.github.io/monocli](https://monolex.github.io/monocli/)
+
 **The canonical session layer for AI CLIs.**
 
 Claude Code, Codex, Grok, OpenCode, and Antigravity each speak a private
@@ -18,8 +20,6 @@ Your sessions stop being app-locked artifacts and become portable data you
 own. monocli is the session plane of [Monolex](https://monolex.ai) — one
 concept layer of the AI-native terminal, shipped as a standalone CLI.
 
-> 🌐 **Site:** [monolex.github.io/monocli](https://monolex.github.io/monocli/)
->
 > 🎬 **Demo video:** [watch the 2-minute demo](https://drive.google.com/file/d/1yfJIDcbOtL9j4aF5vqPfpaUTt5HRJK3N/view)
 >
 > 📚 **Docs:** [docs.monolex.ai/ai-clis/monocli](https://docs.monolex.ai/ai-clis/monocli)
