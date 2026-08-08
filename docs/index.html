@@ -150,6 +150,7 @@
     <a href="#lossless">Lossless</a>
     <a href="#features">Features</a>
     <a href="#tour">Quick tour</a>
+    <a href="#install">Install</a>
     <a href="#demo">Demo</a>
     <a href="https://github.com/monolex/monocli">GitHub ↗</a>
   </div>
@@ -300,6 +301,47 @@
 <span class="c"># continue the same work in a different CLI</span>
 <span class="p">$</span> monocli translate claude/7244c5a3 --to codex --native
 <span class="p">$</span> monocli resume codex/&lt;new-id&gt;</pre>
+</div></section>
+
+<section id="install"><div class="wrap">
+  <div class="kicker">Install</div>
+  <h2>A binary away.</h2>
+  <p class="sub">Self-contained binaries on
+    <a href="https://github.com/monolex/monocli/releases">GitHub Releases</a> —
+    or let the <a href="https://openclis.com">OpenCLIs</a> toolchain manage
+    installs and updates for you.</p>
+  <div class="cols" style="align-items:start">
+    <div>
+      <h3 style="font-family:var(--mono);font-size:15px;color:var(--ink)">Direct download
+        <span style="color:var(--faint);font-weight:400">· GitHub Releases</span></h3>
+      <pre class="term"><span class="c"># macOS (Apple Silicon) — Developer ID-signed</span>
+<span class="p">$</span> curl -fsSL https://github.com/monolex/monocli/releases/latest/download/monocli-aarch64-apple-darwin.tar.gz | tar xz
+
+<span class="c"># Linux (x86_64)</span>
+<span class="p">$</span> curl -fsSL https://github.com/monolex/monocli/releases/latest/download/monocli-x86_64-unknown-linux-gnu.tar.gz | tar xz
+
+<span class="c"># Windows (x86_64, PowerShell)</span>
+<span class="p">&gt;</span> curl.exe -fsSL https://github.com/monolex/monocli/releases/latest/download/monocli-x86_64-pc-windows-msvc.tar.gz -o monocli.tar.gz
+<span class="p">&gt;</span> tar xzf monocli.tar.gz
+
+<span class="p">$</span> ./monocli/monocli version</pre>
+      <p class="cap">SHA-256 checksums for every asset ship in the
+        <a href="https://github.com/monolex/monocli/releases/latest">release notes</a>.
+        The binary is self-contained — put it anywhere on your PATH.</p>
+    </div>
+    <div>
+      <h3 style="font-family:var(--mono);font-size:15px;color:var(--ink)">Managed
+        <span style="color:var(--faint);font-weight:400">· OpenCLIs</span></h3>
+      <pre class="term"><span class="c"># fresh machine — openclis toolchain + monocli</span>
+<span class="p">$</span> OPENCLIS_WITH="monocli" curl -fsSL https://openclis.com/install.sh | sh
+
+<span class="c"># already have openclis — install or update</span>
+<span class="p">$</span> openclis install monocli</pre>
+      <p class="cap">Checksum-verified installs, one-command updates, release
+        channels, and platform fallback — the managed lane for whole-toolchain
+        setups.</p>
+    </div>
+  </div>
 </div></section>
 
 <section id="providers"><div class="wrap">

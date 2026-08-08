@@ -78,6 +78,50 @@ and filtered by provider, working directory, or time window:
 monocli list --provider claude --cwd ~/Projects/foo --since 2026-08-01T09:00
 ```
 
+## Install
+
+Grab a binary from [**GitHub Releases**](https://github.com/monolex/monocli/releases) —
+self-contained, no dependencies:
+
+**macOS (Apple Silicon)** — Developer ID-signed
+
+```sh
+curl -fsSL https://github.com/monolex/monocli/releases/latest/download/monocli-aarch64-apple-darwin.tar.gz | tar xz
+./monocli/monocli version
+```
+
+**Linux (x86_64)**
+
+```sh
+curl -fsSL https://github.com/monolex/monocli/releases/latest/download/monocli-x86_64-unknown-linux-gnu.tar.gz | tar xz
+./monocli/monocli version
+```
+
+**Windows (x86_64, PowerShell)**
+
+```powershell
+curl.exe -fsSL https://github.com/monolex/monocli/releases/latest/download/monocli-x86_64-pc-windows-msvc.tar.gz -o monocli.tar.gz
+tar xzf monocli.tar.gz
+.\monocli\monocli.exe version
+```
+
+Move the binary anywhere on your `PATH` — its docs are embedded. SHA-256
+checksums for every asset are in the [release notes](https://github.com/monolex/monocli/releases/latest).
+
+Or let [**OpenCLIs**](https://openclis.com) manage it — checksum-verified
+installs, one-command updates, release channels:
+
+```sh
+# fresh machine — installs the openclis toolchain + monocli
+OPENCLIS_WITH="monocli" curl -fsSL https://openclis.com/install.sh | sh
+
+# already have openclis? install or update any time
+openclis install monocli
+```
+
+First steps: `monocli providers` to see what's on the machine, `monocli list`
+to enumerate sessions, bare `monocli` for the TUI.
+
 ## Supported CLIs
 
 | Provider | Status | Native store |
