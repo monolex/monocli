@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>monocli — the canonical session layer for AI CLIs</title>
+<meta name="description" content="monocli normalizes Claude Code, Codex, Grok, OpenCode, and Antigravity sessions into one complete canonical model — browse, search, and move whole sessions between CLIs, losslessly.">
+<meta property="og:title" content="monocli — the canonical session layer for AI CLIs">
+<meta property="og:description" content="Every message, every tool call, every image — one canonical model, portable across AI CLIs. Lossless, verified, fail-closed.">
+<meta property="og:image" content="https://monolex.github.io/monocli/assets/hero-tui.png">
+<meta property="og:url" content="https://monolex.github.io/monocli/">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b0f16'/%3E%3Ctext x='32' y='42' font-family='monospace' font-size='30' fill='%2358e6c6' text-anchor='middle'%3E▚%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#0b0f16; --bg2:#0e131c; --panel:#121826; --line:#1e2635;
+    --ink:#e7edf5; --dim:#93a1b3; --faint:#5c6b7e;
+    --acc:#58e6c6; --acc2:#7aa2ff; --warn:#e8b339;
+    --mono:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,Roboto,'Helvetica Neue',Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.65;
+       -webkit-font-smoothing:antialiased;font-size:16px}
+  a{color:var(--acc);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:1020px;margin:0 auto;padding:0 24px}
+  /* nav */
+  nav{position:sticky;top:0;z-index:10;background:rgba(11,15,22,.86);backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--line)}
+  .nav-in{display:flex;align-items:center;gap:20px;height:56px}
+  .brand{font-family:var(--mono);font-weight:700;font-size:17px;color:var(--ink)}
+  .brand span{color:var(--acc)}
+  .nav-links{margin-left:auto;display:flex;gap:18px;font-size:14px}
+  .nav-links a{color:var(--dim)}
+  .nav-links a:hover{color:var(--ink);text-decoration:none}
+  /* hero */
+  header{padding:76px 0 40px;background:
+    radial-gradient(900px 420px at 70% -10%,rgba(88,230,198,.07),transparent 60%),
+    radial-gradient(700px 380px at 10% 0%,rgba(122,162,255,.06),transparent 55%)}
+  .eyebrow{font-family:var(--mono);font-size:12.5px;letter-spacing:.18em;color:var(--acc);
+           text-transform:uppercase;margin-bottom:18px}
+  h1{font-size:clamp(30px,5vw,46px);line-height:1.15;letter-spacing:-.015em;font-weight:750;max-width:820px}
+  h1 em{font-style:normal;color:var(--acc)}
+  .lead{margin:22px 0 0;max-width:760px;color:var(--dim);font-size:clamp(16px,2vw,18.5px)}
+  .lead b{color:var(--ink);font-weight:600}
+  .cta{display:flex;flex-wrap:wrap;gap:12px;margin:30px 0 0}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:14.5px;
+       padding:11px 18px;border-radius:8px;border:1px solid var(--line);color:var(--ink);
+       background:var(--panel);transition:.15s}
+  .btn:hover{border-color:var(--acc);text-decoration:none;transform:translateY(-1px)}
+  .btn.primary{background:var(--acc);border-color:var(--acc);color:#06110d;font-weight:700}
+  .btn.primary:hover{filter:brightness(1.08)}
+  /* screenshot frame */
+  .shot{margin:48px 0 0;border:1px solid var(--line);border-radius:12px;overflow:hidden;
+        box-shadow:0 24px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(88,230,198,.05)}
+  .shot .bar{display:flex;align-items:center;gap:6px;height:34px;padding:0 14px;
+             background:var(--bg2);border-bottom:1px solid var(--line)}
+  .dot{width:11px;height:11px;border-radius:50%;background:#2a3446}
+  .shot .bar .t{margin-left:10px;font-family:var(--mono);font-size:12px;color:var(--faint)}
+  .shot img{display:block;width:100%;height:auto}
+  .cap{margin-top:12px;font-size:13.5px;color:var(--faint);font-family:var(--mono)}
+  /* sections */
+  section{padding:64px 0;border-top:1px solid var(--line)}
+  .kicker{font-family:var(--mono);font-size:12.5px;letter-spacing:.16em;color:var(--acc2);
+          text-transform:uppercase;margin-bottom:12px}
+  h2{font-size:clamp(23px,3.4vw,30px);letter-spacing:-.01em;font-weight:700;max-width:760px}
+  .sub{margin:14px 0 0;color:var(--dim);max-width:740px}
+  /* diagram */
+  pre.diagram{margin:36px 0 0;padding:26px 10px;background:var(--bg2);border:1px solid var(--line);
+      border-radius:12px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.5;
+      color:var(--dim);text-align:center}
+  pre.diagram b{color:var(--acc);font-weight:400}
+  pre.diagram i{color:var(--ink);font-style:normal}
+  /* two-col */
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-top:40px;align-items:center}
+  @media(max-width:840px){.cols{grid-template-columns:1fr}}
+  .check{list-style:none;margin-top:22px;display:grid;gap:10px;font-size:15px}
+  .check li{padding-left:26px;position:relative;color:var(--dim)}
+  .check li::before{content:'✓';position:absolute;left:0;color:var(--acc);font-family:var(--mono)}
+  .check li b{color:var(--ink);font-weight:600}
+  .no{margin-top:22px;display:grid;gap:8px;font-family:var(--mono);font-size:13.5px}
+  .no div{color:var(--faint)}
+  .no div::before{content:'✗  ';color:#e06c75}
+  /* cards */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:40px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px}
+  .card h3{font-size:16px;margin-bottom:8px;font-family:var(--mono);font-weight:600;color:var(--ink)}
+  .card h3 span{color:var(--acc);margin-right:8px}
+  .card p{font-size:14px;color:var(--dim)}
+  .card code{font-family:var(--mono);font-size:12.5px;color:var(--acc2)}
+  /* terminal block */
+  pre.term{margin:36px 0 0;padding:22px 24px;background:var(--bg2);border:1px solid var(--line);
+      border-radius:12px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.85;
+      color:var(--ink)}
+  pre.term .p{color:var(--warn)}
+  pre.term .c{color:var(--faint)}
+  /* table */
+  .tbl{margin-top:36px;border:1px solid var(--line);border-radius:12px;overflow:hidden;overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+  th,td{text-align:left;padding:12px 18px;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+     color:var(--faint);background:var(--bg2)}
+  td{color:var(--dim)}
+  td:first-child{color:var(--ink);font-weight:600}
+  td code{font-family:var(--mono);font-size:12.5px;color:var(--acc2)}
+  tr:last-child td{border-bottom:0}
+  .pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:2px 9px;
+        border-radius:99px;border:1px solid var(--line);color:var(--acc)}
+  .pill.ro{color:var(--warn)}
+  /* video */
+  .video{margin-top:36px;border:1px solid var(--line);border-radius:12px;overflow:hidden;
+         aspect-ratio:16/9;background:var(--bg2)}
+  .video iframe{width:100%;height:100%;border:0}
+  /* footer */
+  footer{border-top:1px solid var(--line);padding:44px 0 60px;font-size:14px;color:var(--faint)}
+  .foot{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between}
+  .status{font-family:var(--mono);font-size:12.5px;color:var(--warn)}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap nav-in">
+  <div class="brand">mono<span>cli</span></div>
+  <div class="nav-links">
+    <a href="#canon">Concept</a>
+    <a href="#lossless">Lossless</a>
+    <a href="#features">Features</a>
+    <a href="#tour">Quick tour</a>
+    <a href="#demo">Demo</a>
+    <a href="https://github.com/monolex/monocli">GitHub ↗</a>
+  </div>
+</div></nav>
+
+<header><div class="wrap">
+  <div class="eyebrow">Monolex · Session Plane</div>
+  <h1>Every AI CLI speaks its own dialect.<br>monocli is the <em>canon</em>.</h1>
+  <p class="lead">
+    Claude Code, Codex, Grok, OpenCode, and Antigravity each lock your sessions in a
+    private format. monocli normalizes them into one <b>complete canonical model</b> —
+    every message, every tool call and its result, thinking, images, native&nbsp;IDs,
+    usage, lineage — so you can <b>browse everything, search everything, and move whole
+    sessions between CLIs, losslessly</b>.
+  </p>
+  <div class="cta">
+    <a class="btn primary" href="https://github.com/monolex/monocli">★&nbsp; GitHub</a>
+    <a class="btn" href="https://drive.google.com/file/d/1yfJIDcbOtL9j4aF5vqPfpaUTt5HRJK3N/view">▶&nbsp; 2-min demo</a>
+    <a class="btn" href="https://docs.monolex.ai/ai-clis/monocli">📚&nbsp; Docs</a>
+  </div>
+  <figure class="shot">
+    <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="t">monocli tui — 500 sessions · scope: monolex/</span></div>
+    <img src="assets/hero-tui.png" alt="monocli TUI: file-tree scope, cross-provider session table (claude / codex / grok), and a live session detail pane" loading="eager">
+  </figure>
+  <div class="cap">One TUI over every provider on the machine — claude, codex, and grok sessions in a single scoped table, detail pane on the right.</div>
+</div></header>
+
+<section id="canon"><div class="wrap">
+  <div class="kicker">The concept</div>
+  <h2>Five private dialects in, one canonical form out — and back again.</h2>
+  <p class="sub">
+    Adapters decode each provider's native store into the canonical session model.
+    Everything downstream — the browser, search, export, resume, translation — speaks
+    only canon. Because the model is complete, the arrow also points backwards:
+    a canonical session can be <b style="color:var(--ink)">written back</b> as a real
+    native session in any other CLI's store.
+  </p>
+  <pre class="diagram">
+  ┌────────────┬────────────┬────────────┬────────────┬────────────┐
+  │<i> Claude Code</i>│<i>   Codex    </i>│<i>    Grok    </i>│<i>  OpenCode  </i>│<i>Antigravity </i>│
+  │  ~/.claude │  ~/.codex  │   ~/.grok  │ opencode.db│  ~/.gemini │
+  └─────┬──────┴─────┬──────┴─────┬──────┴─────┬──────┴─────┬──────┘
+        │            │            │            │            │
+        └────────────┴────────────┼────────────┴────────────┘
+                          decode  <b>▼</b>  <b>▲</b>  write back
+        ┌───────────────────────────────────────────────────┐
+        │                <i>provider adapters</i>                  │
+        │  one codec per native format (JSONL/SQLite/pb)    │
+        └─────────────────────────┬─────────────────────────┘
+                                  <b>▼</b>
+        ┌───────────────────────────────────────────────────┐
+        │             <i>canonical session model</i>               │
+        │  messages · tool calls · images · git · lineage   │
+        └─────────────────────────┬─────────────────────────┘
+                                  <b>▼</b>
+        ┌───────────────────────────────────────────────────┐
+        │  browse (TUI) · search · read · export · resume   │
+        │  <b>translate --native</b> → a real session written      │
+        │  into another CLI's own store, verified lossless  │
+        └───────────────────────────────────────────────────┘</pre>
+</div></section>
+
+<section id="lossless"><div class="wrap">
+  <div class="kicker">Lossless means lossless</div>
+  <h2>Not a text export. Every block, translated one by one.</h2>
+  <p class="sub">
+    <code style="font-family:var(--mono);color:var(--acc2)">monocli translate &lt;id&gt; --to &lt;cli&gt; --native</code>
+    reconstructs the session in the target's own encoding, block by block, then proves it.
+  </p>
+  <div class="cols">
+    <div>
+      <ul class="check">
+        <li><b>Messages &amp; roles</b> — including empty messages, exact timestamps, native IDs</li>
+        <li><b>Tool calls &amp; tool results</b> — with native tool provenance; unmapped provider tools ride verbatim as <b>ToolCall::Unknown</b></li>
+        <li><b>Thinking blocks</b>, model &amp; request metadata, token usage</li>
+        <li><b>Images</b> — bytes embedded into the target store, never path references</li>
+        <li><b>Source snapshot</b> — an immutable copy of the original SessionMeta rides along; A→B→C chains keep it without nesting</li>
+      </ul>
+      <div class="no">
+        <div>no fidelity levels</div>
+        <div>no text fallback</div>
+        <div>no silent truncation — unrepresentable sessions fail closed</div>
+      </div>
+      <p class="sub" style="margin-top:22px;font-size:14.5px">
+        Every write is <b style="color:var(--ink)">reparsed through the target adapter and
+        verified against the source</b> — native-visible records and exact canonical
+        messages must both pass before the write lands, and the installed session is
+        audited again afterward.
+      </p>
+    </div>
+    <figure class="shot" style="margin:0">
+      <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="t">monocli read codex/019fe29e — tool blocks</span></div>
+      <img src="assets/read-blocks.png" alt="monocli read view showing individual bash tool-call blocks and tool results preserved from a Codex session" loading="lazy">
+    </figure>
+  </div>
+</div></section>
+
+<section id="features"><div class="wrap">
+  <div class="kicker">Surface</div>
+  <h2>One binary, the whole session plane.</h2>
+  <div class="grid">
+    <div class="card"><h3><span>▚</span>Interactive TUI</h3>
+      <p>Bare <code>monocli</code> opens a fast 2-panel browser over every session on the
+      machine; piped output falls back to script-friendly tables.</p></div>
+    <div class="card"><h3><span>⌕</span>Cross-CLI search</h3>
+      <p>BM25-ranked FTS5 index across all providers at once — <code>monocli search</code>,
+      with a bounded linear-scan fallback when unindexed.</p></div>
+    <div class="card"><h3><span>⇄</span>Native transcode</h3>
+      <p>Move a whole session into another CLI's store and keep working there —
+      <code>translate --to codex --native</code>, verified lossless.</p></div>
+    <div class="card"><h3><span>⑂</span>Cross-CLI lineage</h3>
+      <p>Fork a session into a different CLI, link parent/child edges between providers,
+      reconcile pending forks, render the family <code>tree</code>.</p></div>
+    <div class="card"><h3><span>↻</span>Resume anywhere</h3>
+      <p><code>monocli resume</code> emits the exact provider-native resume command for
+      any session it can see.</p></div>
+    <div class="card"><h3><span>Σ</span>Usage-aware</h3>
+      <p>Per-session token and cost columns via the Monometer usage engine; plus a
+      23-check PTY self-test harness (<code>monocli test auto</code>).</p></div>
+  </div>
+</div></section>
+
+<section id="tour"><div class="wrap">
+  <div class="kicker">Quick tour</div>
+  <h2>Address any session as <span style="font-family:var(--mono);color:var(--acc)">provider/id</span>.</h2>
+  <pre class="term"><span class="c"># what's on this machine?</span>
+<span class="p">$</span> monocli providers
+<span class="p">$</span> monocli list --cwd ~/Projects/foo --since 2026-08-01T09:00
+
+<span class="c"># browse / read / raw</span>
+<span class="p">$</span> monocli tui
+<span class="p">$</span> monocli read codex/019de9e0
+<span class="p">$</span> monocli cat claude/7244c5a3 &gt; out.jsonl
+
+<span class="c"># search everything at once</span>
+<span class="p">$</span> monocli search "writer lock" --provider claude
+
+<span class="c"># continue the same work in a different CLI</span>
+<span class="p">$</span> monocli translate claude/7244c5a3 --to codex --native
+<span class="p">$</span> monocli resume codex/&lt;new-id&gt;</pre>
+</div></section>
+
+<section id="providers"><div class="wrap">
+  <div class="kicker">Coverage</div>
+  <h2>Adapters</h2>
+  <div class="tbl"><table>
+    <tr><th>Provider</th><th>Support</th><th>Native store</th></tr>
+    <tr><td>Claude Code</td><td><span class="pill">full</span></td><td><code>~/.claude/projects/**.jsonl</code></td></tr>
+    <tr><td>Codex</td><td><span class="pill">full</span></td><td><code>~/.codex/sessions/**.jsonl</code></td></tr>
+    <tr><td>Grok</td><td><span class="pill">full</span></td><td><code>~/.grok/sessions/**</code> (4-file split)</td></tr>
+    <tr><td>OpenCode</td><td><span class="pill">full</span></td><td><code>~/.local/share/opencode/opencode.db</code></td></tr>
+    <tr><td>Antigravity (agy)</td><td><span class="pill">full</span></td><td><code>~/.gemini/antigravity-cli/**</code> (.pb/.db)</td></tr>
+    <tr><td>Cursor (IDE agent)</td><td><span class="pill ro">read-only</span></td><td>Cursor local store</td></tr>
+  </table></div>
+  <p class="sub" style="margin-top:18px;font-size:14px">
+    macOS &amp; Linux fully supported; Windows supported with the Windows SQLite toolchain.
+  </p>
+</div></section>
+
+<section id="demo"><div class="wrap">
+  <div class="kicker">Demo</div>
+  <h2>Two minutes, end to end.</h2>
+  <div class="video">
+    <iframe src="https://drive.google.com/file/d/1yfJIDcbOtL9j4aF5vqPfpaUTt5HRJK3N/preview"
+            allow="autoplay; fullscreen" title="monocli demo video"></iframe>
+  </div>
+  <p class="cap">If the embed doesn't load,
+    <a href="https://drive.google.com/file/d/1yfJIDcbOtL9j4aF5vqPfpaUTt5HRJK3N/view">watch it on Drive</a>.</p>
+</div></section>
+
+<footer><div class="wrap foot">
+  <div>
+    <span class="status">experimental public preview — source release in preparation</span>
+  </div>
+  <div>
+    <a href="https://github.com/monolex/monocli">GitHub</a> ·
+    <a href="https://docs.monolex.ai/ai-clis/monocli">Docs</a> ·
+    a <a href="https://monolex.ai"><b>Monolex AI</b></a> project
+  </div>
+</div></footer>
+
+</body>
+</html>
