@@ -11,6 +11,31 @@ read, export, resume, and even *move sessions between CLIs*.
 >
 > 📚 **Docs:** [docs.monolex.ai/ai-clis/monocli](https://docs.monolex.ai/ai-clis/monocli)
 
+```
+  ┌────────────┬────────────┬────────────┬────────────┬────────────┐
+  │ Claude Code│   Codex    │    Grok    │  OpenCode  │Antigravity │
+  │  ~/.claude │  ~/.codex  │   ~/.grok  │ opencode.db│  ~/.gemini │
+  └─────┬──────┴─────┬──────┴─────┬──────┴─────┬──────┴─────┬──────┘
+        │            │            │            │            │
+        └────────────┴────────────┼────────────┴────────────┘
+                                  ▼
+        ┌───────────────────────────────────────────────────┐
+        │                 provider adapters                 │
+        │  one decoder per native format (JSONL/SQLite/pb)  │
+        └─────────────────────────┬─────────────────────────┘
+                                  ▼
+        ┌───────────────────────────────────────────────────┐
+        │              canonical session model              │
+        │  messages · tool calls · images · git · lineage   │
+        └─────────────────────────┬─────────────────────────┘
+                                  ▼
+        ┌───────────────────────────────────────────────────┐
+        │  browse (TUI) · search · read · export · resume   │
+        │  translate --native → a real session written      │
+        │  into another CLI's own store, verified lossless  │
+        └───────────────────────────────────────────────────┘
+```
+
 ---
 
 ## What it does
