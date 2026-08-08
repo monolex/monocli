@@ -67,12 +67,34 @@
           text-transform:uppercase;margin-bottom:12px}
   h2{font-size:clamp(23px,3.4vw,30px);letter-spacing:-.01em;font-weight:700;max-width:760px}
   .sub{margin:14px 0 0;color:var(--dim);max-width:740px}
-  /* diagram */
-  pre.diagram{margin:36px 0 0;padding:26px 10px;background:var(--bg2);border:1px solid var(--line);
-      border-radius:12px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.5;
-      color:var(--dim);text-align:center}
-  pre.diagram b{color:var(--acc);font-weight:400}
-  pre.diagram i{color:var(--ink);font-style:normal}
+  /* flow diagram (div-based) */
+  .flowd{margin:44px auto 0;display:flex;flex-direction:column;align-items:center;max-width:660px}
+  .srcs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;width:100%}
+  @media(max-width:660px){.srcs{grid-template-columns:repeat(auto-fit,minmax(112px,1fr))}}
+  .src{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+       padding:12px 4px;text-align:center;min-width:0}
+  .src b{display:block;font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--ink)}
+  .src span{display:block;font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-top:4px}
+  .converge{width:86%;height:1px;margin-top:14px;
+            background:linear-gradient(90deg,transparent,var(--line) 12%,var(--line) 88%,transparent)}
+  .vline{width:1px;height:22px;background:#2a3446}
+  .duplex{display:flex;gap:10px;align-items:center;margin:2px 0}
+  .pill2{font-family:var(--mono);font-size:11.5px;padding:3px 11px;border-radius:99px;
+         border:1px solid var(--line);background:var(--bg2)}
+  .pill2.down{color:var(--acc)}
+  .pill2.up{color:var(--acc2)}
+  .dbox{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:12px;
+        padding:16px 18px;text-align:center}
+  .dbox h4{font-family:var(--mono);font-size:14.5px;font-weight:600;color:var(--ink);letter-spacing:.02em}
+  .dbox p{font-family:var(--mono);font-size:12px;color:var(--dim);margin-top:6px;line-height:1.7}
+  .dbox.canon{border-color:rgba(88,230,198,.38);box-shadow:inset 0 0 30px rgba(88,230,198,.045)}
+  .dbox.canon h4{color:var(--acc)}
+  .dbox .ops{font-family:var(--mono);font-size:12.5px;color:var(--ink);line-height:1.9}
+  .dbox .note{font-family:var(--mono);font-size:11.5px;color:var(--dim);margin-top:8px;line-height:1.8}
+  .dbox .note b{color:var(--acc);font-weight:600}
+  .dstep{display:flex;flex-direction:column;align-items:center}
+  .tri{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;
+       border-top:7px solid #3a4666;margin-bottom:2px}
   /* two-col */
   .cols{display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-top:40px;align-items:center}
   @media(max-width:840px){.cols{grid-template-columns:1fr}}
@@ -166,29 +188,37 @@
     a canonical session can be <b style="color:var(--ink)">written back</b> as a real
     native session in any other CLI's store.
   </p>
-  <pre class="diagram">
-  ┌────────────┬────────────┬────────────┬────────────┬────────────┐
-  │<i> Claude Code</i>│<i>   Codex    </i>│<i>    Grok    </i>│<i>  OpenCode  </i>│<i>Antigravity </i>│
-  │  ~/.claude │  ~/.codex  │   ~/.grok  │ opencode.db│  ~/.gemini │
-  └─────┬──────┴─────┬──────┴─────┬──────┴─────┬──────┴─────┬──────┘
-        │            │            │            │            │
-        └────────────┴────────────┼────────────┴────────────┘
-                          decode  <b>▼</b>  <b>▲</b>  write back
-        ┌───────────────────────────────────────────────────┐
-        │                <i>provider adapters</i>                  │
-        │  one codec per native format (JSONL/SQLite/pb)    │
-        └─────────────────────────┬─────────────────────────┘
-                                  <b>▼</b>
-        ┌───────────────────────────────────────────────────┐
-        │             <i>canonical session model</i>               │
-        │  messages · tool calls · images · git · lineage   │
-        └─────────────────────────┬─────────────────────────┘
-                                  <b>▼</b>
-        ┌───────────────────────────────────────────────────┐
-        │  browse (TUI) · search · read · export · resume   │
-        │  <b>translate --native</b> → a real session written      │
-        │  into another CLI's own store, verified lossless  │
-        └───────────────────────────────────────────────────┘</pre>
+  <div class="flowd">
+    <div class="srcs">
+      <div class="src"><b>Claude Code</b><span>~/.claude</span></div>
+      <div class="src"><b>Codex</b><span>~/.codex</span></div>
+      <div class="src"><b>Grok</b><span>~/.grok</span></div>
+      <div class="src"><b>OpenCode</b><span>opencode.db</span></div>
+      <div class="src"><b>Antigravity</b><span>~/.gemini</span></div>
+    </div>
+    <div class="converge"></div>
+    <div class="vline"></div>
+    <div class="duplex">
+      <span class="pill2 down">decode ▼</span>
+      <span class="pill2 up">▲ write back</span>
+    </div>
+    <div class="vline"></div>
+    <div class="dbox">
+      <h4>provider adapters</h4>
+      <p>one codec per native format — JSONL / SQLite / protobuf</p>
+    </div>
+    <div class="dstep"><div class="vline"></div><div class="tri"></div></div>
+    <div class="dbox canon">
+      <h4>canonical session model</h4>
+      <p>messages · tool calls · results · thinking · images · usage · git · lineage</p>
+    </div>
+    <div class="dstep"><div class="vline"></div><div class="tri"></div></div>
+    <div class="dbox">
+      <div class="ops">browse (TUI) · search · read · export · resume</div>
+      <div class="note"><b>translate --native</b> → a real session written into
+        another CLI's own store, verified lossless</div>
+    </div>
+  </div>
 </div></section>
 
 <section id="lossless"><div class="wrap">
