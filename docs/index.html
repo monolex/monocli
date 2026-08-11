@@ -322,14 +322,14 @@ The retry path now backs off exponentially; the
 
 <span class="c"># browse / read / raw</span>
 <span class="p">$</span> monocli tui
-<span class="p">$</span> monocli read codex/019de9e0
-<span class="p">$</span> monocli cat claude/7244c5a3 &gt; out.jsonl
+<span class="p">$</span> monocli read codex/019a1b2c
+<span class="p">$</span> monocli cat claude/1a2b3c4d &gt; out.jsonl
 
 <span class="c"># search everything at once</span>
 <span class="p">$</span> monocli search "writer lock" --provider claude
 
 <span class="c"># continue the same work in a different CLI</span>
-<span class="p">$</span> monocli translate claude/7244c5a3 --to codex --native
+<span class="p">$</span> monocli translate claude/1a2b3c4d --to codex --native
 <span class="p">$</span> monocli resume codex/&lt;new-id&gt;</pre>
 </div></section>
 
