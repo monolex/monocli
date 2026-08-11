@@ -1,2 +1,5 @@
 .monogram/
 .playwright-mcp/
+/target
+**/target
+.DS_Store

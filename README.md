@@ -68,9 +68,10 @@ monocli translate <ID> --to <cli> --native
 monocli providers                    show adapter availability on this machine
 ```
 
-Sessions are addressed as `<provider>/<short-id>` — `claude/7244c5a3`,
-`codex/019de9e0`, `grok/05f90c2e`, `opencode/ses_54c2`, `agy/67c5c950` —
-and filtered by provider, working directory, or time window:
+Sessions are addressed as `<provider>/<short-id>` — `claude/1a2b3c4d`,
+`codex/019a1b2c`, `grok/7f0e1d2c`, `opencode/ses_ab12`, `agy/3c4d5e6f`
+(example ids throughout are placeholders) — and filtered by provider,
+working directory, or time window:
 
 ```
 monocli list --provider claude --cwd ~/Projects/foo --since 2026-08-01T09:00
@@ -103,7 +104,7 @@ tar xzf monocli.tar.gz
 .\monocli\monocli.exe version
 ```
 
-Move the binary anywhere on your `PATH` — its docs are embedded. SHA-256
+Move the binary anywhere on your `PATH` — its help is built in. SHA-256
 checksums for every asset are in the [release notes](https://github.com/monolex/monocli/releases/latest).
 
 Or let [**OpenCLIs**](https://openclis.com) manage it — checksum-verified
@@ -181,9 +182,11 @@ follow along.
 
 # Full CLI reference
 
-The complete built-in help (`initiate.md`) — running bare `monocli` with no
-arguments prints this reference. Every OpenCLIs tool ships its full help this
-way so both humans and AI agents can discover the entire surface offline.
+The complete CLI reference that ships with the tool (`initiate.md`, deployed
+beside the binary and into your agent's skill directory on install).
+`monocli --help` prints the condensed version. Every OpenCLIs tool ships its
+full help this way so both humans and AI agents can discover the entire
+surface offline.
 
 ## USAGE
 
@@ -208,9 +211,10 @@ monocli providers                    show adapter availability
 ## ID FORMAT
 
 ```
-<provider>/<short>          claude/7244c5a3, codex/019de9e0,
-                            grok/05f90c2e, opencode/ses_54c2, agy/67c5c950
+<provider>/<short>          claude/1a2b3c4d, codex/019a1b2c,
+                            grok/7f0e1d2c, opencode/ses_ab12, agy/3c4d5e6f
 <full-uuid>                 also accepted for any provider
+                            (example ids throughout are placeholders)
 ```
 
 ## FILTERS (`list`)
@@ -250,7 +254,11 @@ Self-test:
 monocli test auto                 expected: 23 passed / 0 failed
 monocli test spawn                show initial TUI screen from PTY harness
 monocli test key q                spawn, send q, show resulting screen
+monocli test spawn --demo         same, against a synthetic session store
 ```
+
+`spawn`, `key` and `screen` render YOUR sessions — titles, working directories,
+branch names. Add `--demo` for anything that leaves your machine.
 
 ## PROVIDERS
 
@@ -270,11 +278,11 @@ monocli list --provider claude       Claude sessions only
 monocli list --provider agy          Antigravity canonical mirror sessions
 monocli list --cwd ~/Projects/foo    sessions started under this directory
 monocli list --since 2026-05-28T20:00 last 8 hours (local time)
-monocli show claude/7244c5a3         session metadata + preview
-monocli read codex/019de9e0          full conversation as markdown
-monocli cat claude/7244c5a3 > out.jsonl   raw jsonl dump
-monocli resume codex/019de9e0        emit `codex resume -C <cwd> <uuid>`
-monocli translate claude/7244c5a3 --to agy --native
+monocli show claude/1a2b3c4d         session metadata + preview
+monocli read codex/019a1b2c          full conversation as markdown
+monocli cat claude/1a2b3c4d > out.jsonl   raw jsonl dump
+monocli resume codex/019a1b2c        emit `codex resume -C <cwd> <uuid>`
+monocli translate claude/1a2b3c4d --to agy --native
 monocli test auto                    verify TUI render, keys, picker, scope
 ```
 
@@ -282,8 +290,8 @@ monocli test auto                    verify TUI render, keys, picker, scope
 
 ```
 PROVIDER  ID          WHEN              MSGS   MODEL             TITLE/SLUG               CWD
-claude    7244c5a3    2026-05-28 14:32  127    claude-opus-4-7   wondrous-popping-hedgehog .../app-monolex
-codex     019de9e0    2026-05-28 12:08   85    openai            lib-niia-core refactor    .../app-monolex
+claude    1a2b3c4d    2026-05-28 14:32  127    claude-opus-4-7   wondrous-popping-hedgehog .../my-project
+codex     019a1b2c    2026-05-28 12:08   85    openai            parser refactor           .../my-project
 ```
 
 ## CANONICAL MODEL
@@ -406,6 +414,28 @@ and `title`.
   platform data-dir fallbacks such as `%LOCALAPPDATA%\opencode`.
 
 `[NEXT] monocli show <id>   monocli read <id>   monocli providers`
+
+---
+
+## Privacy
+
+monocli reads transcripts, so it is worth showing how it handles them.
+
+- **Redaction is structural, not just textual.** `export --redact` masks
+  vendor-marked credentials, JWTs, PEM blocks, your home path (including the
+  percent- and dash-encoded forms providers use for directory names), and
+  provider reasoning signatures — the last by field name, because that value is
+  opaque base64 no text scan can recognize. It is best-effort: a bare
+  high-entropy token carries no marker and will pass through, so read the output
+  before you send it. `read`, `cat`, `show` and `search` do **not** redact.
+- **Remote transport fails closed.** A session cannot leave the machine through
+  the portable export path unless redaction is on.
+- **Peer device names are hashed** before becoming path components, with a test
+  asserting the name never lands on disk.
+- **External image URLs are omitted and fingerprinted** rather than followed —
+  the test input for that path models a URL that *is* a credential.
+- **Screenshots and logs**: `monocli test spawn --demo` renders a synthetic
+  store instead of yours.
 
 ---
 
