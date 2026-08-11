@@ -7,7 +7,6 @@
 <meta name="description" content="monocli normalizes Claude Code, Codex, Grok, OpenCode, and Antigravity sessions into one complete canonical model — browse, search, and move whole sessions between CLIs, losslessly.">
 <meta property="og:title" content="monocli — the canonical session layer for AI CLIs">
 <meta property="og:description" content="Every message, every tool call, every image — one canonical model, portable across AI CLIs. Lossless, verified, fail-closed.">
-<meta property="og:image" content="https://monolex.github.io/monocli/assets/hero-tui.png">
 <meta property="og:url" content="https://monolex.github.io/monocli/">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b0f16'/%3E%3Ctext x='32' y='42' font-family='monospace' font-size='30' fill='%2358e6c6' text-anchor='middle'%3E▚%3C/text%3E%3C/svg%3E">
@@ -60,6 +59,11 @@
   .dot{width:11px;height:11px;border-radius:50%;background:#2a3446}
   .shot .bar .t{margin-left:10px;font-family:var(--mono);font-size:12px;color:var(--faint)}
   .shot img{display:block;width:100%;height:auto}
+  pre.tui{margin:0;padding:18px 20px;background:#0a0e15;overflow-x:auto;
+      font-family:var(--mono);font-size:12.5px;line-height:1.75;color:var(--dim)}
+  pre.tui .sel{display:block;background:#16324a;color:var(--ink)}
+  pre.tui .key{color:var(--acc)}
+  pre.tui .dim{color:var(--faint)}
   .cap{margin-top:12px;font-size:13.5px;color:var(--faint);font-family:var(--mono)}
   /* sections */
   section{padding:64px 0;border-top:1px solid var(--line);scroll-margin-top:64px}
@@ -169,15 +173,21 @@
   </p>
   <div class="cta">
     <a class="btn primary" href="https://github.com/monolex/monocli">★&nbsp; GitHub</a>
-    <a class="btn" href="https://drive.google.com/file/d/1yfJIDcbOtL9j4aF5vqPfpaUTt5HRJK3N/view">▶&nbsp; 2-min demo</a>
+    <a class="btn" href="#install">⬇&nbsp; Install</a>
     <a class="btn" href="https://docs.monolex.ai/ai-clis/monocli">📚&nbsp; Docs</a>
   </div>
   <figure class="shot">
     <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
-      <span class="t">monocli tui — 500 sessions · scope: monolex/</span></div>
-    <img src="assets/hero-tui.png" alt="monocli TUI: file-tree scope, cross-provider session table (claude / codex / grok), and a live session detail pane" loading="eager">
+      <span class="t">monocli tui — one table over every provider</span></div>
+    <pre class="tui">PROVIDER  ID          WHEN              MSGS  MODEL            TITLE / CWD
+<span class="sel">claude    1a2b3c4d    2026-03-04 14:32   127  claude-opus-4-7  parser refactor        ~/Projects/app</span>
+codex     019a1b2c    2026-03-04 12:08    85  gpt-5.5-pro      retry backoff review   ~/Projects/app
+grok      7f0e1d2c    2026-03-04 09:51    34  grok-4.5         세션 제목 자동 생성     ~/Projects/app
+opencode  ses_ab12    2026-03-03 18:20   210  claude-sonnet-4  index incremental scan ~/Projects/api
+agy       3c4d5e6f    2026-03-03 11:04    62  gemini-3-pro     transcode round-trip   ~/Projects/api
+claude    5b6c7d8e    2026-03-02 16:45    98  claude-opus-4-7  fts5 query planner     ~/Projects/api</pre>
   </figure>
-  <div class="cap">One TUI over every provider on the machine — claude, codex, and grok sessions in a single scoped table, detail pane on the right.</div>
+  <div class="cap">One TUI over every provider on the machine — claude, codex, grok, opencode and agy sessions in a single scoped table, detail pane on the right.</div>
 </div></header>
 
 <section id="canon"><div class="wrap">
@@ -253,8 +263,27 @@
     </div>
     <figure class="shot" style="margin:0">
       <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
-        <span class="t">monocli read codex/019fe29e — tool blocks</span></div>
-      <img src="assets/read-blocks.png" alt="monocli read view showing individual bash tool-call blocks and tool results preserved from a Codex session" loading="lazy">
+        <span class="t">monocli read codex/019a1b2c — tool blocks</span></div>
+      <pre class="tui"><span class="dim">```tool: bash</span>
+{
+  <span class="key">"kind"</span>: "bash",
+  <span class="key">"cmd"</span>: "cargo test -p parser --lib",
+  <span class="key">"timeout_ms"</span>: null,
+  <span class="key">"run_in_background"</span>: false
+}
+<span class="dim">```</span>
+
+<span class="dim">---</span>
+<span class="key">**TOOL**</span> (2026-03-04 12:09)
+
+&gt; [OK] tool_result call_a1b2c3d4e5f6
+&gt; test result: ok. 41 passed; 0 failed
+&gt;
+<span class="dim">---</span>
+<span class="key">**ASSISTANT**</span> (2026-03-04 12:09)
+
+The retry path now backs off exponentially; the
+41 parser tests still pass unchanged.</pre>
     </figure>
   </div>
 </div></section>
@@ -365,12 +394,10 @@
 <section id="demo"><div class="wrap">
   <div class="kicker">Demo</div>
   <h2>Two minutes, end to end.</h2>
-  <div class="video">
-    <iframe src="https://drive.google.com/file/d/1yfJIDcbOtL9j4aF5vqPfpaUTt5HRJK3N/preview"
-            allow="autoplay; fullscreen" title="monocli demo video"></iframe>
-  </div>
-  <p class="cap">If the embed doesn't load,
-    <a href="https://drive.google.com/file/d/1yfJIDcbOtL9j4aF5vqPfpaUTt5HRJK3N/view">watch it on Drive</a>.</p>
+  <p class="sub">A recorded walkthrough is being re-cut against a synthetic
+    session store and will land here shortly. Until then, the fastest demo is
+    your own machine: <code style="font-family:var(--mono);color:var(--acc2)">monocli providers</code>
+    then bare <code style="font-family:var(--mono);color:var(--acc2)">monocli</code>.</p>
 </div></section>
 
 <footer><div class="wrap foot">
